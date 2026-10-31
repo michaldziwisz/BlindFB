@@ -71,11 +71,16 @@
   const roots = () => [...document.querySelectorAll('script[type="application/json"]')].flatMap(script => {
     try { return [JSON.parse(script.textContent)]; } catch { return []; }
   });
+  function notifId(value) {
+    try { return new URL(value).searchParams.get('notif_id'); } catch { return null; }
+  }
   function notificationRoots(target) {
-    const data = roots(), alert = new URL(target).searchParams.get('notif_id');
+    const alert = notifId(target);
+    if (!alert) return [];
+    const data = roots();
     for (const row of document.querySelectorAll('[role=listitem]')) {
       const link = row.querySelector('a[href]');
-      if (!link || new URL(link.href).searchParams.get('notif_id') !== alert) continue;
+      if (!link || notifId(link.href) !== alert) continue;
       let fiber = row[Object.keys(row).find(key => key.startsWith('__reactFiber$'))];
       // Hydrated/paged notifications may live only in React's current props, not initial JSON.
       for (let depth = 0; fiber && depth < 8; depth++, fiber = fiber.return) {
