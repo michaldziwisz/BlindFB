@@ -1084,7 +1084,9 @@ pub fn install(kind: BrowserKind) -> Result<String, String> {
             ),
             BrowserKind::Edge => (
                 "Microsoft.Edge",
-                "https://go.microsoft.com/fwlink/?linkid=2109047",
+                // The old fwlink (2109047) now redirects to an Office outage page;
+                // 2093437 still serves MicrosoftEdgeEnterpriseX64.msi.
+                "https://go.microsoft.com/fwlink/?linkid=2093437",
                 "microsoft-edge.msi",
             ),
             BrowserKind::Firefox => (
