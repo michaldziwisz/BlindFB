@@ -590,8 +590,10 @@ mod platform {
             );
         }
         let _ = child.kill();
-        let _ = child.wait();
+        // Clear the PID before reaping: once wait() returns, Windows may reuse the
+        // PID, and a concurrent shutdown() would then terminate an unrelated process.
         lifetime.lock().unwrap().pid = 0;
+        let _ = child.wait();
     }
 
     #[cfg(test)]
