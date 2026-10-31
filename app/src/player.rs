@@ -379,6 +379,17 @@ mod platform {
             report(snapshot, Some(PlayerEvent::Error("The video player is not installed.".into())));
             return;
         };
+        if hwnd == 0 {
+            // Without a real parent handle mpv opens its own top-level window with
+            // --wid=0, which steals focus and cannot be closed from the keyboard.
+            report(
+                snapshot,
+                Some(PlayerEvent::Error(
+                    "The video area is not ready. Close this post and try again.".into(),
+                )),
+            );
+            return;
+        }
         static SERIAL: AtomicU64 = AtomicU64::new(0);
         let pipe_name = format!(
             r"\\.\pipe\blindfb-mpv-{}-{}",
