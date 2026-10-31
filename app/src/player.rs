@@ -396,8 +396,7 @@ mod platform {
             std::process::id(),
             SERIAL.fetch_add(1, Ordering::Relaxed)
         );
-        let mut guard = lifetime.lock().unwrap();
-        if guard.stopped {
+        if lifetime.lock().unwrap().stopped {
             return;
         }
         let child = Command::new(binary)
@@ -427,7 +426,6 @@ mod platform {
         let mut child = match child {
             Ok(child) => child,
             Err(_) => {
-                drop(guard);
                 report(
                     snapshot,
                     Some(PlayerEvent::Error("The video player could not start.".into())),
@@ -435,8 +433,17 @@ mod platform {
                 return;
             }
         };
-        guard.pid = child.id();
-        drop(guard);
+        {
+            let mut guard = lifetime.lock().unwrap();
+            if guard.stopped {
+                // Shutdown raced the spawn; do not leave the player running.
+                drop(guard);
+                let _ = child.kill();
+                let _ = child.wait();
+                return;
+            }
+            guard.pid = child.id();
+        }
         let result = (|| -> std::io::Result<()> {
             let deadline = Instant::now() + Duration::from_secs(10);
             let mut pipe = loop {
