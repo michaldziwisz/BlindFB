@@ -406,6 +406,7 @@ fn run() {
 
     let items_label = StaticText::builder(&panel).with_label("Items").build();
     let items = ListBox::builder(&panel).with_size(Size::new(-1, 260)).build();
+    items.set_name("Items in this section. Enter opens the selected item");
 
     let links_label = StaticText::builder(&panel).with_label("Lin&ks in selected item").build();
     let links = ListBox::builder(&panel).with_size(Size::new(-1, 70)).build();
@@ -418,6 +419,7 @@ fn run() {
         .with_style(TextCtrlStyle::MultiLine | TextCtrlStyle::ReadOnly)
         .with_size(Size::new(-1, 170))
         .build();
+    details.set_name("Details of the selected item. Read-only");
 
     let actions = BoxSizer::builder(Orientation::Horizontal).build();
     let refresh_btn = Button::builder(&panel).with_label("Refresh (F5)").build();
@@ -444,6 +446,7 @@ fn run() {
     let compose = BoxSizer::builder(Orientation::Horizontal).build();
     let compose_label = StaticText::builder(&panel).with_label("Message").build();
     let compose_box = TextCtrl::builder(&panel).with_style(TextCtrlStyle::ProcessEnter).build();
+    compose_box.set_name("Message to send. Enter sends it");
     let attach_btn = Button::builder(&panel).with_label("Attach files").build();
     let send_btn = Button::builder(&panel).with_label("Send").build();
     compose.add(&compose_label, 0, SizerFlag::AlignCenterVertical | SizerFlag::All, 3);
