@@ -484,6 +484,7 @@ fn kind_from_hint(hint: &str) -> Option<BrowserKind> {
 pub fn default_browser_kind() -> Option<BrowserKind> {
     #[cfg(windows)]
     {
+        use std::os::windows::process::CommandExt;
         let output = Command::new("reg")
             .args([
                 "query",
@@ -491,6 +492,9 @@ pub fn default_browser_kind() -> Option<BrowserKind> {
                 "/v",
                 "ProgId",
             ])
+            // Hides the console window; without it the reg call flashes on every Fb
+            // construction and steals focus from the screen reader.
+            .creation_flags(0x0800_0000) // CREATE_NO_WINDOW
             .output()
             .ok()?;
         let text = String::from_utf8_lossy(&output.stdout);
