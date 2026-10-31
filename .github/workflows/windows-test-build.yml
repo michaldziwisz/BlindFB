@@ -1,0 +1,32 @@
+name: Windows test build
+
+# Temporary: builds an unsigned Windows package for a hand test on the user's
+# machine. Lives only on the test/batch2 branch and is not part of any PR.
+
+on:
+  push:
+    branches: ["test/batch2"]
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: Package for testing (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - name: Package with shipfitter (unsigned test build)
+        run: cargo xtask package
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blindfb-windows-test
+          path: dist/BlindFB.zip
+          if-no-files-found: error
